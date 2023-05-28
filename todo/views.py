@@ -1,7 +1,8 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views import View
-from django import forms
+from .forms import TaskForm
+
 
 # Create your views here.
 
@@ -18,11 +19,27 @@ def get_task_by_id(task_id):
     return None
 
 def index(request):
-    ctx = {"tasks": tasks }
+    taskform = TaskForm()
+    print(request.session['tasks'])
+    if "tasks" not in request.session:
+        request.session['tasks'] = []
+    ctx = {"tasks": request.session['tasks'], "form": taskform }
     return render(request, "todo/index.html", ctx)
 
 def add_task(request):
     print(request.POST)
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            print(form.cleaned_data)
+            task = {
+                "id": len(tasks) + 1,
+                "name": form.cleaned_data['task'],
+                "description": form.cleaned_data['description'],
+                "priority": int(form.cleaned_data['priority']),
+            }
+            request.session['tasks'].append(task)
+            print(request.session['tasks'])
     return HttpResponseRedirect(reverse('todo:index'))
 
 def task(request, id):
