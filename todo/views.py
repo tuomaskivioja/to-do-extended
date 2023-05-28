@@ -6,6 +6,7 @@ from .models import Task
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.forms import UserCreationForm
 import json
 
 # Create your views here.
@@ -22,6 +23,22 @@ def index(request):
     tasks = Task.objects.filter(user=request.user)
     ctx = {"tasks": tasks, "form": task_form}
     return render(request, "todo/index.html", ctx)
+
+def register_user(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        print(form)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(request, username=username, password=password)
+            login(request, user)
+            return HttpResponseRedirect(reverse('todo:index'))
+    else:
+        form = UserCreationForm()
+    
+    return render(request, 'todo/register.html', {'form': form})
 
 def login_user(request):
     if request.method == 'POST':
