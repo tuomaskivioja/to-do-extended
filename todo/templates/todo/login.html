@@ -1,0 +1,13 @@
+{% extends 'todo/layout.html' %}
+
+{% block content %}
+    <h1>Login</h1>
+    <form method="post">
+        {% csrf_token %}
+        <!-- Add your form fields and submit button here -->
+        <input type="text" name="username" placeholder="Username"><br>
+        <input type="password" name="password" placeholder="Password"><br>
+        <button type="submit">Login</button>
+    </form>
+    <p>New here? <a href="{% url 'todo:register' %}">Register here</a></p>
+{% endblock %}
